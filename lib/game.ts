@@ -1,7 +1,5 @@
+import { RANKS, SUITS } from '@/constants/suits';
 import { Card, GameState, GameAction, Suit, Rank } from '../types/types';
-
-const SUITS: Suit[] = ['hearts', 'diamonds', 'clubs', 'spades'];
-const RANKS: Rank[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
 export function createDeck(): Card[] {
   const deck: Card[] = [];
@@ -83,6 +81,40 @@ export function getCardValue(card: Card, trumpSuit: Suit): number {
   return rankValues[card.rank];
 }
 
+export function sortHandBySuit(hand: Card[], trumpSuit: Suit): Card[] {
+  const cardsBySuit: { [key in Suit]: Card[] } = {
+    'hearts': [],
+    'diamonds': [],
+    'clubs': [],
+    'spades': []
+  };
+
+  hand.forEach(card => {
+    cardsBySuit[card.suit].push(card);
+  });
+
+  Object.keys(cardsBySuit).forEach(suit => {
+    cardsBySuit[suit as Suit].sort((a, b) =>
+      getCardValue(b, trumpSuit) - getCardValue(a, trumpSuit)
+    );
+  });
+
+  const sortedHand: Card[] = [];
+
+  if (cardsBySuit[trumpSuit].length > 0) {
+    sortedHand.push(...cardsBySuit[trumpSuit]);
+  }
+
+  SUITS.forEach(suit => {
+    if (suit !== trumpSuit && cardsBySuit[suit].length > 0) {
+      sortedHand.push(...cardsBySuit[suit]);
+    }
+  });
+
+  return sortedHand;
+}
+
+
 export function determineTrickWinner(trick: Card[], trumpSuit: Suit): number {
   let winningCardIndex = 0;
   let highestValue = getCardValue(trick[0], trumpSuit);
@@ -103,12 +135,19 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'DEAL_CARDS':
       return dealCards(state);
 
-    case 'SET_TRUMP':
+    case 'SET_TRUMP': {
+      if (!action.suit || !SUITS.includes(action.suit)) {
+        return state;
+      }
+
       return {
         ...state,
         trumpSuit: action.suit,
         gamePhase: 'بازی',
+        currentPlayerIndex: state.dealerIndex, // First player to the left of dealer starts
+        currentTrick: [], // Clear any existing trick
       };
+    }
 
     case 'PLAY_CARD': {
       const currentPlayer = state.players[state.currentPlayerIndex];
