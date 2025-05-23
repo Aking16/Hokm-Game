@@ -3,7 +3,7 @@ import { sortHandBySuit } from "@/lib/game";
 import { cn } from "@/lib/utils";
 import { Card, GameAction, GameState } from "@/types/types";
 import { Dispatch } from "react";
-import GameCard from "../cards/game-card";
+import PlayerDeck from "../cards/player-deck";
 
 interface GameBoardProps {
   gameState: GameState;
@@ -24,7 +24,7 @@ const GameBoard = ({ gameState, dispatch }: GameBoardProps) => {
           <div
             key={player.id}
             className={cn(
-              "absolute space-y-4",
+              "absolute space-y-2",
               positions[index],
               rotations[index]
             )}
@@ -36,19 +36,20 @@ const GameBoard = ({ gameState, dispatch }: GameBoardProps) => {
               {player.name}
               {index === gameState.currentPlayerIndex && ' (فعلی)'}
             </h3>
-            <div className="flex">
+            <div className="flex justify-center relative">
               {sortHandBySuit(player.hand, gameState.trumpSuit ?? "hearts")
-                .map((card, cardIndex) => (
-                  <div
+                .map((card, cardIndex) =>
+                  <PlayerDeck
                     key={cardIndex}
+                    value={card.rank}
+                    suit={card.suit}
                     onClick={() => handleCardClick(card)}
-                    className="cursor-pointer transition-transform -ms-16 hover:scale-105 !hover:z-50 first:ms-0"
-                  >
-                    <GameCard value={card.rank} suit={card.suit} />
-                  </div>
-                ))}
+                    totalCards={player.hand.length}
+                    cardIndex={cardIndex}
+                  />
+                )}
             </div>
-            <div className="mt-2 text-center">
+            <div className="text-center">
               <p className="bg-background/80 px-4 py-2 rounded-lg">
                 دست های برنده شده: {player.tricks.length}
               </p>

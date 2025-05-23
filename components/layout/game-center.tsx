@@ -1,9 +1,9 @@
 import React, { Dispatch, FC } from 'react';
 import SuitCard from '../cards/suit-card';
-import GameCard from '../cards/game-card';
 import { GameAction, GameState } from '@/types/types';
 import { Suit } from '@/types/types';
 import { SUITS } from '@/constants/suits';
+import GameCard from '../cards/game-card';
 
 interface GameCenterProps {
   gameState: GameState;
@@ -32,7 +32,11 @@ const GameCenter: FC<GameCenterProps> = ({ gameState, dispatch }) => {
         :
         <div className="grid grid-cols-2 gap-4">
           {gameState.currentTrick.map((card, index) => (
-            <GameCard key={index} value={card.rank} suit={card.suit} />
+            <GameCard
+              key={index}
+              value={card.rank}
+              suit={card.suit}
+            />
           ))}
         </div>
       }
