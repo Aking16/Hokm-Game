@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="fa-IR" dir="rtl">
       <body
-        className={`${vazirmatn.className} antialiased`}
+        className={`${vazirmatn.className} antialiased dark`}
       >
         {children}
       </body>
